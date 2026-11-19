@@ -1,0 +1,31 @@
+{
+  "name": "NORTHLINE Freelancer OS",
+  "short_name": "NORTHLINE",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f4f6fa",
+  "theme_color": "#101827",
+  "description": "Freelancer business management workspace",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "id": "./index.html",
+  "lang": "ar",
+  "dir": "rtl",
+  "scope": "./"
+}
