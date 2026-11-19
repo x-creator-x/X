@@ -1,4 +1,4 @@
-const CACHE = "northline-os-v2";
+const CACHE = "northline-os-v3";
 const ASSETS = [
   "./",
   "./index.html",
