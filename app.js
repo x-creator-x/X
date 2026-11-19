@@ -21,6 +21,7 @@ const iso = (d) => {
 };
 const uid = () => Math.random().toString(36).slice(2, 10);
 const defaults = {
+  isDemo: true,
   settings: {
     currency: "EGP",
     goal: 30000,
@@ -424,18 +425,18 @@ function dashboard() {
     });
   }
   let max = Math.max(1, ...incomeByMonth.flatMap((x) => [x.v, x.e]));
-  return `${head("مساحة عملك، بصورة أوضح", "إليك ملخص نشاطك المالي والتشغيلي لهذا الشهر.", btn("＋ إضافة مشروع", "openAdd('projects')"))}<div class="welcome-card"><small>YOUR FREELANCE BUSINESS, IN CONTROL</small><h2>مرحبًا بعودتك، ${db.settings.name || "صديقي"} 👋</h2><p>كل عميل ومشروع ودفعة في مكان واحد. استمر في بناء عمل مستقل أكثر تنظيمًا.</p><div class="welcome-actions"><button onclick="setPage('projects')">عرض المشاريع ↗</button><button onclick="setPage('pricing')">احسب سعرك ↗</button></div></div>
+  return `${head("مساحة عملك، بصورة أوضح", "إليك ملخص نشاطك المالي والتشغيلي لهذا الشهر.", btn("＋ إضافة مشروع", "openAdd('projects')"))}${demoBanner()}<div class="welcome-card"><small>YOUR FREELANCE BUSINESS, IN CONTROL</small><h2>مرحبًا بعودتك، ${db.settings.name || "صديقي"} 👋</h2><p>كل عميل ومشروع ودفعة في مكان واحد. استمر في بناء عمل مستقل أكثر تنظيمًا.</p><div class="welcome-actions"><button onclick="setPage('projects')">عرض المشاريع ↗</button><button onclick="setPage('pricing')">احسب سعرك ↗</button></div></div>
 <div class="grid stats-grid"><div class="stat-card"><div class="stat-top">الدخل هذا الشهر <span class="stat-icon">↗</span></div><div class="stat-value">${money(s.income)}</div><div class="stat-foot">إجمالي الدفعات المستلمة</div></div><div class="stat-card"><div class="stat-top">صافي الربح <span class="stat-icon" style="color:#16a783;background:#e8f8f3">◈</span></div><div class="stat-value">${money(s.profit)}</div><div class="stat-foot">بعد خصم مصروفات الشهر</div></div><div class="stat-card"><div class="stat-top">مستحقات العملاء <span class="stat-icon" style="color:#c58b35;background:#fff5e6">◷</span></div><div class="stat-value">${money(s.receivable)}</div><div class="stat-foot">مبالغ لم يتم تحصيلها بعد</div></div><div class="stat-card"><div class="stat-top">مشاريع نشطة <span class="stat-icon" style="color:#8b76d8;background:#f1edff">▤</span></div><div class="stat-value">${s.active}</div><div class="stat-foot">منها ${s.late} مشاريع متأخرة</div></div></div>
 <div class="grid dashboard-grid"><section class="panel"><div class="panel-head"><div><h3>النشاط المالي</h3><p>الدخل والمصروفات — آخر 6 أشهر</p></div><span class="badge blue">${db.settings.currency}</span></div><div class="chart">${incomeByMonth.map((x) => `<div class="bar-group"><div style="display:flex;align-items:flex-end;gap:4px;height:100%;width:100%;justify-content:center"><div class="bar" style="height:${Math.max(2, (x.v / max) * 100)}%" title="الدخل ${money(x.v)}"></div><div class="bar expense" style="height:${Math.max(2, (x.e / max) * 100)}%" title="المصروف ${money(x.e)}"></div></div><span class="bar-label">${x.label}</span></div>`).join("")}</div><div class="chart-legend"><span><i class="legend-dot"></i>الدخل</span><span><i class="legend-dot orange"></i>المصروفات</span></div></section><section class="panel"><div class="panel-head"><div><h3>هدف الدخل الشهري</h3><p>تابع تقدمك نحو الهدف الذي حددته</p></div><span class="badge blue">${Math.round(s.goal * 100)}%</span></div><div class="progress-wrap"><div class="progress-meta"><span>تم تحقيقه</span><b>${money(s.income)}</b></div><div class="progress"><span style="width:${Math.min(100, s.goal * 100)}%"></span></div><div class="progress-meta" style="margin-top:8px"><span>الهدف الشهري</span><b>${money(db.settings.goal)}</b></div></div><div class="fund-row"><div class="fund"><small>ضرائب وطوارئ</small><b>${money(Math.max(0, s.profit) * db.settings.tax)}</b></div><div class="fund"><small>ادخار</small><b>${money(Math.max(0, s.profit) * db.settings.save)}</b></div><div class="fund"><small>مصروف شخصي</small><b>${money(Math.max(0, s.profit) * (1 - db.settings.tax - db.settings.save))}</b></div></div><div class="progress-meta" style="margin-top:17px"><span>هامش الربح</span><b>${Math.round(s.margin * 100)}%</b></div></section></div>
 <div class="grid dashboard-grid"><section class="panel"><div class="panel-head"><div><h3>تنبيهات ذكية</h3><p>ما يحتاج انتباهك الآن</p></div><span class="badge orange">${alerts.length} تنبيهات</span></div><div class="alert-list">${alerts.length ? alerts.map((x) => `<div class="alert ${/متأخر/.test(x.d.alert) ? "danger" : ""}"><div class="alert-symbol">${/متأخر/.test(x.d.alert) ? "!" : "◷"}</div><div><b>${x.p.name}</b><small>${x.d.alert} · ${x.p.client}</small></div></div>`).join("") : empty("✓", "كل شيء تحت السيطرة", "لا توجد تنبيهات حالية")}</div></section><section class="panel"><div class="panel-head"><div><h3>توزيع الربح</h3><p>تقسيم صافي الربح بعد المصروفات</p></div></div><div class="alert-list"><div class="alert"><div class="alert-symbol" style="background:#e8f8f3;color:#16a783">◈</div><div><b>ضرائب وطوارئ — ${Math.round(db.settings.tax * 100)}%</b><small>${money(Math.max(0, s.profit) * db.settings.tax)}</small></div></div><div class="alert"><div class="alert-symbol" style="background:#edf1ff;color:#657ee0">⌂</div><div><b>ادخار — ${Math.round(db.settings.save * 100)}%</b><small>${money(Math.max(0, s.profit) * db.settings.save)}</small></div></div><div class="alert"><div class="alert-symbol" style="background:#fff5e6;color:#c18b3b">◎</div><div><b>مصروف شخصي — ${Math.round((1 - db.settings.tax - db.settings.save) * 100)}%</b><small>${money(Math.max(0, s.profit) * (1 - db.settings.tax - db.settings.save))}</small></div></div></div></section></div>
-<div class="table-panel"><div class="table-head"><h3>المشاريع القادمة</h3><button class="tiny-btn" onclick="setPage('projects')">عرض الكل ↗</button></div>${projectTable(ps)}</div>`;
+${dueSection()}<div class="table-panel"><div class="table-head"><h3>المشاريع القادمة</h3><button class="tiny-btn" onclick="setPage('projects')">عرض الكل ↗</button></div>${projectTable(ps)}</div>`;
 }
 function projectTable(items) {
   return items.length
     ? `<div class="table-wrap"><table><thead><tr><th>المشروع</th><th>العميل</th><th>السعر</th><th>الحالة</th><th>موعد التسليم</th><th>التنبيه</th><th></th></tr></thead><tbody>${items
         .map((p) => {
           let d = projectData(p);
-          return `<tr><td><div class="entity"><div class="entity-avatar">▤</div><div><b>${esc(p.name)}</b><small>${esc(p.service)}</small></div></div></td><td>${esc(p.client)}</td><td><b>${money(p.price, p.currency)}</b></td><td>${badge(p.status)}</td><td>${p.due || "—"}</td><td>${badge(d.alert)}</td><td><button class="tiny-btn" onclick="editEntry('projects','${p.id}')">تعديل</button></td></tr>`;
+          return `<tr><td><div class="entity"><div class="entity-avatar">▤</div><div><b>${esc(p.name)}</b><small>${esc(p.service)}</small></div></div></td><td>${esc(p.client)}</td><td><b>${money(p.price, p.currency)}</b></td><td>${badge(p.status)}</td><td>${p.due || "—"}</td><td>${badge(d.alert)}</td><td><div class="table-actions"><button class="tiny-btn" onclick="editEntry('projects','${p.id}')">تعديل</button><button class="tiny-btn" onclick="openInvoice('${p.id}')">فاتورة</button></div></td></tr>`;
         })
         .join("")}</tbody></table></div>`
     : empty("▤", "لا توجد مشاريع", "أضف أول مشروع لبدء المتابعة");
@@ -765,7 +766,7 @@ function settingsPage() {
     )
     .join(
       "",
-    )}</div><button class="primary-btn" onclick="saveRates()">حفظ أسعار الصرف</button><p style="color:var(--muted);font-size:10px;margin-top:13px">أسعار الصرف تقريبية وقابلة للتعديل. حدّثها يدويًا لتكون تقاريرك دقيقة.</p></section><section class="panel settings-card" style="grid-column:1/-1"><h3>البيانات والنسخ الاحتياطي</h3><p style="color:var(--muted);font-size:11px">بياناتك محفوظة محليًا على هذا الجهاز والمتصفح. صدّر نسخة احتياطية بانتظام قبل تغيير الجهاز أو حذف بيانات المتصفح.</p><div style="display:flex;gap:9px;flex-wrap:wrap"><button class="secondary-btn" onclick="exportData()">تصدير نسخة JSON</button><label class="secondary-btn" style="cursor:pointer">استيراد نسخة<input type="file" accept="application/json" hidden onchange="importData(event)"></label><button class="danger-btn" onclick="resetData()">إعادة ضبط بيانات التجربة</button></div></section></div>`;
+    )}</div><button class="primary-btn" onclick="saveRates()">حفظ أسعار الصرف</button><p style="color:var(--muted);font-size:10px;margin-top:13px">أسعار الصرف تقريبية وقابلة للتعديل. حدّثها يدويًا لتكون تقاريرك دقيقة.</p></section><section class="panel settings-card" style="grid-column:1/-1"><h3>البيانات والنسخ الاحتياطي</h3><p style="color:var(--muted);font-size:11px">بياناتك محفوظة محليًا على هذا الجهاز والمتصفح. صدّر نسخة احتياطية بانتظام قبل تغيير الجهاز أو حذف بيانات المتصفح.</p><div style="display:flex;gap:9px;flex-wrap:wrap"><button class="secondary-btn" onclick="exportData()">تصدير نسخة JSON</button><label class="secondary-btn" style="cursor:pointer">استيراد نسخة<input type="file" accept="application/json" hidden onchange="importData(event)"></label><button class="secondary-btn" onclick="startEmpty(this)">ابدأ بنسخة فارغة</button><button class="danger-btn" onclick="resetData()">إعادة ضبط بيانات التجربة</button></div></section></div>`;
 }
 function saveSettings() {
   let s = db.settings;
@@ -796,6 +797,147 @@ function saveRates() {
   save();
   toast("تم تحديث أسعار الصرف");
 }
+
+/* ---------- نسخة فارغة ---------- */
+function demoBanner() {
+  if (db.isDemo === false) return "";
+  return `<div class="demo-banner"><div><b>أنت تشاهد بيانات تجريبية</b><span>جرّب التطبيق بحرية، ثم ابدأ بنسخة فارغة لتدخل بياناتك أنت.</span></div><div class="demo-actions"><button class="primary-btn small" onclick="startEmpty(this)">ابدأ بنسخة فارغة</button><button class="secondary-btn small" onclick="hideDemo()">إخفاء</button></div></div>`;
+}
+function hideDemo() {
+  db.isDemo = false;
+  save();
+  render();
+}
+function startEmpty(btn) {
+  if (!btn.dataset.armed) {
+    btn.dataset.armed = "1";
+    btn.dataset.label = btn.textContent;
+    btn.textContent = "اضغط مرة أخرى لحذف بيانات التجربة";
+    setTimeout(() => {
+      if (btn.isConnected) {
+        delete btn.dataset.armed;
+        btn.textContent = btn.dataset.label;
+      }
+    }, 4000);
+    return;
+  }
+  db.clients = [];
+  db.projects = [];
+  db.payments = [];
+  db.expenses = [];
+  db.time = [];
+  db.isDemo = false;
+  save();
+  setPage("clients");
+  toast("أصبحت نسختك فارغة. أضف أول عميل");
+  openAdd("clients");
+}
+
+/* ---------- المستحقات والتذكير ---------- */
+function overdueList() {
+  return db.projects
+    .map((p) => ({ p, d: projectData(p) }))
+    .filter(
+      ({ p, d }) =>
+        p.status !== "ملغي" &&
+        d.remaining > 0.5 &&
+        (p.status === "مكتمل" || (d.days !== null && d.days < 0)),
+    )
+    .sort((x, y) => y.d.remainingBase - x.d.remainingBase);
+}
+function dueSection() {
+  const list = overdueList();
+  const rows = list
+    .slice(0, 5)
+    .map(({ p, d }) => {
+      const why =
+        d.days !== null && d.days < 0
+          ? `متأخر ${Math.abs(d.days)} يوم`
+          : "مكتمل وبانتظار الدفع";
+      return `<div class="due-row"><div class="due-info"><b>${esc(p.name)}</b><small>${esc(p.client)} · ${why}</small></div><div class="due-side"><b>${money(d.remaining, p.currency)}</b><div class="table-actions"><button class="tiny-btn" onclick="remindPayment('${p.id}')">تذكير ↗</button><button class="tiny-btn" onclick="openInvoice('${p.id}')">فاتورة</button></div></div></div>`;
+    })
+    .join("");
+  return `<section class="panel due-panel"><div class="panel-head"><div><h3>دفعات مستحقة</h3><p>مشاريع لديها مبلغ لم يُحصَّل بعد</p></div><span class="badge ${list.length ? "red" : "green"}">${list.length}</span></div>${list.length ? rows : empty("✓", "لا توجد مستحقات متأخرة", "كل المشاريع المكتملة محصّلة بالكامل")}</section>`;
+}
+function remindPayment(id) {
+  const p = db.projects.find((x) => x.id === id);
+  if (!p) return;
+  setPage("messages");
+  $("#msgProject").value = p.name;
+  $("#msgKind").value = "تذكير بالدفع";
+  updateMessage();
+  toast("رسالة التذكير جاهزة. انسخها وأرسلها للعميل");
+}
+
+/* ---------- الفاتورة ---------- */
+function invNo(p) {
+  if (!p.invNo) {
+    db.settings.invSeq = (db.settings.invSeq || 0) + 1;
+    p.invNo = `INV-${today.getFullYear()}-${String(db.settings.invSeq).padStart(3, "0")}`;
+    save();
+  }
+  return p.invNo;
+}
+function invoiceText(p) {
+  const d = projectData(p);
+  return `فاتورة ${invNo(p)}\nمن: ${db.settings.name}\nإلى: ${p.client}\nالتاريخ: ${iso(today)}\n\nالمشروع: ${p.name} (${p.service})\nالإجمالي: ${money(p.price, p.currency)}\nالمدفوع: ${money(d.paid, p.currency)}\nالمتبقي: ${money(Math.max(0, d.remaining), p.currency)}\n\nطريقة الدفع: ${db.settings.payInfo}\nشكرًا لتعاملك معنا.`;
+}
+function openInvoice(id) {
+  const p = db.projects.find((x) => x.id === id);
+  if (!p) return;
+  const d = projectData(p),
+    no = invNo(p),
+    pays = db.payments
+      .filter((x) => x.project === p.name)
+      .sort((x, y) => x.date.localeCompare(y.date)),
+    settled = d.remaining <= 0.5;
+  let ov = $("#invoiceOverlay");
+  if (!ov) {
+    ov = document.createElement("div");
+    ov.id = "invoiceOverlay";
+    ov.className = "invoice-overlay";
+    document.body.appendChild(ov);
+  }
+  ov.onclick = (e) => {
+    if (e.target === ov) closeInvoice();
+  };
+  const share = navigator.share
+    ? `<button class="secondary-btn small" onclick="shareInvoice('${p.id}')">مشاركة</button>`
+    : "";
+  ov.innerHTML = `<div class="invoice-tools no-print"><button class="primary-btn small" onclick="window.print()">طباعة / حفظ PDF</button><button class="secondary-btn small" onclick="copyInvoice('${p.id}')">نسخ كنص</button>${share}<button class="secondary-btn small" onclick="closeInvoice()">إغلاق ×</button></div>
+<article class="invoice-sheet" dir="rtl">
+<header class="inv-head"><div><div class="inv-brand">${esc(db.settings.name || "NORTHLINE")}</div><small>مستقل</small></div><div class="inv-title"><h2>فاتورة</h2><b>${esc(no)}</b></div></header>
+<div class="inv-meta"><div><small>إلى</small><b>${esc(p.client)}</b></div><div><small>تاريخ الإصدار</small><b>${iso(today)}</b></div><div><small>موعد التسليم</small><b>${esc(p.due || "—")}</b></div><div class="inv-state ${settled ? "ok" : "due"}">${settled ? "مدفوعة بالكامل" : "مستحقة الدفع"}</div></div>
+<table class="inv-table"><thead><tr><th>الوصف</th><th>المبلغ</th></tr></thead><tbody><tr><td><b>${esc(p.name)}</b><small>${esc(p.service)}</small></td><td>${money(p.price, p.currency)}</td></tr></tbody></table>
+${pays.length ? `<table class="inv-table"><thead><tr><th>دفعات مستلمة</th><th>المبلغ</th></tr></thead><tbody>${pays.map((x) => `<tr><td>${esc(x.date)} · ${esc(x.method || "")}</td><td>${money(x.amount, p.currency)}</td></tr>`).join("")}</tbody></table>` : ""}
+<div class="inv-total"><span>المبلغ المتبقي</span><strong>${money(Math.max(0, d.remaining), p.currency)}</strong></div>
+<div class="inv-pay"><small>طريقة الدفع</small><b>${esc(db.settings.payInfo)}</b></div>
+<footer class="inv-foot">شكرًا لتعاملك معنا.</footer>
+</article>`;
+  ov.classList.add("show");
+  document.body.classList.add("invoice-open");
+  ov.scrollTop = 0;
+}
+function closeInvoice() {
+  $("#invoiceOverlay")?.classList.remove("show");
+  document.body.classList.remove("invoice-open");
+}
+function copyInvoice(id) {
+  const p = db.projects.find((x) => x.id === id);
+  if (!p) return;
+  navigator.clipboard
+    ?.writeText(invoiceText(p))
+    .then(() => toast("تم نسخ الفاتورة"))
+    .catch(() => toast("تعذّر النسخ، استخدم الطباعة"));
+}
+function shareInvoice(id) {
+  const p = db.projects.find((x) => x.id === id);
+  if (p)
+    navigator
+      .share({ title: "فاتورة " + invNo(p), text: invoiceText(p) })
+      .catch(() => {});
+}
+
 function render() {
   let el = $("#content");
   if (page === "dashboard") el.innerHTML = dashboard();
@@ -970,6 +1112,13 @@ $("#todayLabel").textContent = today.toLocaleDateString("ar-EG", {
 applyTheme();
 updateCounts();
 render();
+(function overdueNotice() {
+  const n = overdueList().length,
+    key = "northlineNotice";
+  if (!n || store.get(key) === iso(today)) return;
+  store.set(key, iso(today));
+  setTimeout(() => toast(`لديك ${n} مشروع بمبالغ مستحقة`), 900);
+})();
 if ("serviceWorker" in navigator && location.protocol.startsWith("http"))
   window.addEventListener("load", () =>
     navigator.serviceWorker.register("./sw.js").catch(() => {}),

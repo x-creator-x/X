@@ -23,12 +23,7 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family:
-    "IBM Plex Sans Arabic",
-    Manrope,
-    "Segoe UI",
-    Tahoma,
-    system-ui,
-    sans-serif;
+    "IBM Plex Sans Arabic", Manrope, "Segoe UI", Tahoma, system-ui, sans-serif;
   font-size: 14px;
 }
 button,
@@ -1123,5 +1118,229 @@ textarea:focus {
   }
   .footer {
     padding-bottom: 15px;
+  }
+}
+
+/* ---- نسخة تجريبية ---- */
+.demo-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  border-radius: var(--radius);
+  background: var(--panel);
+  border: 1px dashed var(--accent);
+}
+.demo-banner > div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.demo-banner span {
+  color: var(--muted);
+  font-size: 11px;
+}
+.demo-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.secondary-btn.small {
+  padding: 8px 12px;
+  font-size: 11px;
+}
+/* ---- دفعات مستحقة ---- */
+.due-panel {
+  margin-bottom: 17px;
+}
+.due-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+}
+.due-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.due-info small {
+  color: var(--muted);
+  font-size: 10px;
+}
+.due-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+/* ---- الفاتورة ---- */
+.invoice-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: none;
+  overflow: auto;
+  background: #0b1424d9;
+  padding: 16px max(12px, env(safe-area-inset-right)) 32px
+    max(12px, env(safe-area-inset-left));
+}
+.invoice-overlay.show {
+  display: block;
+}
+.invoice-tools {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 720px;
+  margin: 0 auto 12px;
+}
+.invoice-sheet {
+  max-width: 720px;
+  margin: 0 auto;
+  background: #fff;
+  color: #1a2233;
+  border-radius: 14px;
+  padding: 32px;
+  box-shadow: 0 20px 60px #0006;
+}
+.invoice-sheet small {
+  display: block;
+  color: #6b7789;
+  font-size: 10px;
+  margin-bottom: 2px;
+}
+.inv-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #101827;
+}
+.inv-brand {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+.inv-title {
+  text-align: left;
+}
+.inv-title h2 {
+  margin: 0 0 4px;
+  font-size: 24px;
+}
+.inv-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 14px;
+  padding: 20px 0;
+  align-items: center;
+}
+.inv-meta b {
+  font-size: 13px;
+}
+.inv-state {
+  justify-self: end;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 12px;
+}
+.inv-state.ok {
+  background: #e3f6ee;
+  color: #0f7a5c;
+}
+.inv-state.due {
+  background: #fdeaea;
+  color: #b13a45;
+}
+.inv-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 16px;
+}
+.inv-table th {
+  text-align: right;
+  font-size: 10px;
+  color: #6b7789;
+  padding: 8px 0;
+  border-bottom: 1px solid #dfe5ee;
+}
+.inv-table td {
+  padding: 10px 0;
+  border-bottom: 1px solid #eef1f6;
+  font-size: 12px;
+}
+.inv-table th:last-child,
+.inv-table td:last-child {
+  text-align: left;
+  white-space: nowrap;
+}
+.inv-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: #101827;
+  color: #fff;
+}
+.inv-total strong {
+  font-size: 22px;
+}
+.inv-pay {
+  margin-top: 18px;
+}
+.inv-foot {
+  margin-top: 26px;
+  text-align: center;
+  color: #6b7789;
+  font-size: 11px;
+}
+@page {
+  size: A4;
+  margin: 16mm;
+}
+@media print {
+  body.invoice-open .app-shell,
+  body.invoice-open .toast,
+  body.invoice-open .modal-backdrop,
+  .no-print {
+    display: none !important;
+  }
+  body.invoice-open {
+    background: #fff;
+  }
+  body.invoice-open .invoice-overlay {
+    position: static;
+    background: none;
+    padding: 0;
+    overflow: visible;
+    display: block;
+  }
+  .invoice-sheet {
+    box-shadow: none;
+    border-radius: 0;
+    max-width: none;
+    padding: 0;
+  }
+  .inv-total {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+@media (max-width: 760px) {
+  .invoice-sheet {
+    padding: 20px;
   }
 }
